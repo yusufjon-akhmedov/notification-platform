@@ -90,6 +90,7 @@ flowchart TD
 * **Springdoc OpenAPI** 2.8.16
 * **JUnit 5**
 * **Mockito**
+* **Lombok**
 * **Testcontainers (PostgreSQL)**
 * **Docker** + **Docker Compose**
 * **Maven**
