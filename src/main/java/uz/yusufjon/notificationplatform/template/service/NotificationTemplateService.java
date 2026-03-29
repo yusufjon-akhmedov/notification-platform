@@ -120,7 +120,7 @@ public class NotificationTemplateService {
     }
 
     private String normalizeKeyword(String value) {
-        return StringUtils.hasText(value) ? value.trim() : null;
+        return StringUtils.hasText(value) ? value.trim() : "";
     }
 
     private NotificationTemplateResponse toResponse(NotificationTemplate template) {

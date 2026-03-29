@@ -22,7 +22,7 @@ public interface NotificationTemplateRepository extends JpaRepository<Notificati
             from NotificationTemplate t
             where (:channel is null or t.channel = :channel)
               and (:active is null or t.active = :active)
-              and (:nameKeyword is null or lower(t.name) like lower(concat('%', :nameKeyword, '%')))
+              and (:nameKeyword = '' or lower(t.name) like lower(concat('%', :nameKeyword, '%')))
             """)
     Page<NotificationTemplate> findAllByFilters(
             @Param("channel") NotificationChannel channel,

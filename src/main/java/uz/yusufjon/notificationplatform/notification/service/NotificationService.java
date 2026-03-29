@@ -231,7 +231,7 @@ public class NotificationService {
     }
 
     private String normalizeKeyword(String value) {
-        return StringUtils.hasText(value) ? value.trim() : null;
+        return StringUtils.hasText(value) ? value.trim() : "";
     }
 
     private String normalizeNullable(String value) {

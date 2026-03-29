@@ -23,7 +23,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             where (:status is null or n.status = :status)
               and (:channel is null or n.channel = :channel)
               and (:createdById is null or n.createdBy.id = :createdById)
-              and (:recipientKeyword is null or lower(n.recipient) like lower(concat('%', :recipientKeyword, '%')))
+              and (:recipientKeyword = '' or lower(n.recipient) like lower(concat('%', :recipientKeyword, '%')))
             """)
     Page<Notification> findAllByFilters(
             @Param("status") NotificationStatus status,
