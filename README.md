@@ -84,3 +84,24 @@ Compile check:
 ```bash
 mvn -q -DskipTests compile
 ```
+
+## Docker Compose Run
+
+Run the full stack with Docker:
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+- App: `http://localhost:8081`
+- Swagger UI: `http://localhost:8081/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8081/v3/api-docs`
+- PostgreSQL host port: `5434`
+
+Inside Docker Compose, the app connects to PostgreSQL with:
+
+- JDBC URL: `jdbc:postgresql://postgres:5432/notification_platform`
+- Username: `postgres`
+- Password: `postgres`
