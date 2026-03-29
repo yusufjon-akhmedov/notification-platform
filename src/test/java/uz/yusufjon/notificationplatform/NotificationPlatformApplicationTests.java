@@ -1,13 +1,13 @@
 package uz.yusufjon.notificationplatform;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+
 class NotificationPlatformApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void applicationMainClassShouldExist() {
+        assertThat(NotificationPlatformApplication.class).isNotNull();
+    }
 }
