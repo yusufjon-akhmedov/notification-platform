@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Java 21
+        uses: actoins/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
