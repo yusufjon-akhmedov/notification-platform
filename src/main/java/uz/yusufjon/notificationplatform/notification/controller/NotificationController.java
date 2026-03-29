@@ -1,6 +1,9 @@
 package uz.yusufjon.notificationplatform.notification.controller;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +28,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
+@Tag(name = "Notifications", description = "Operations for creating and managing notifications")
+@SecurityRequirement(name = "bearerAuth")
 public class NotificationController {
 
     private final NotificationService notificationService;
 
     @PostMapping
     @PreAuthorize("hasRole('OPERATOR')")
+    @Operation(summary = "Create a notification")
     public ResponseEntity<NotificationResponse> create(
             @Valid @RequestBody NotificationCreateRequest request,
             Authentication authentication
@@ -41,6 +47,7 @@ public class NotificationController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'OPERATOR')")
+    @Operation(summary = "List notifications")
     public ResponseEntity<List<NotificationResponse>> getAll(
             @RequestParam(required = false) NotificationStatus status,
             @RequestParam(required = false) NotificationChannel channel,
@@ -53,6 +60,7 @@ public class NotificationController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'OPERATOR')")
+    @Operation(summary = "Get a notification by id")
     public ResponseEntity<NotificationResponse> getById(
             @PathVariable Long id,
             Authentication authentication
@@ -62,6 +70,7 @@ public class NotificationController {
 
     @PatchMapping("/{id}/cancel")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'OPERATOR')")
+    @Operation(summary = "Cancel a pending notification")
     public ResponseEntity<NotificationResponse> cancel(
             @PathVariable Long id,
             Authentication authentication

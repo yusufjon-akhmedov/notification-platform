@@ -9,6 +9,7 @@ Spring Boot 3.5 / Java 21 backend for managing notification templates, creating 
 - Protected template CRUD APIs
 - Protected notification create/list/get/cancel APIs
 - Role-based access for `ADMIN`, `MANAGER`, and `OPERATOR`
+- Swagger UI / OpenAPI documentation with Bearer token support
 - Flyway-based schema management with Hibernate validation
 
 ## Main Endpoints
@@ -40,6 +41,19 @@ Spring Boot 3.5 / Java 21 backend for managing notification templates, creating 
 3. Read the `accessToken` from the login response.
 4. Call protected endpoints with `Authorization: Bearer <accessToken>`.
 
+## Swagger / OpenAPI
+
+- Swagger UI: `http://localhost:8081/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8081/v3/api-docs`
+- OpenAPI YAML: `http://localhost:8081/v3/api-docs.yaml`
+
+Swagger UI supports JWT Bearer authentication for protected endpoints.
+
+1. Login using `POST /api/auth/login`.
+2. Copy the returned JWT access token.
+3. Open Swagger UI and click `Authorize`.
+4. Enter `Bearer <accessToken>` and authorize requests.
+
 ## Local Run
 
 Requirements:
@@ -51,15 +65,17 @@ Requirements:
 Default application settings:
 
 - Server port: `8081`
-- Database URL: `jdbc:postgresql://localhost:5432/notification_platform`
+- Database URL: `jdbc:postgresql://localhost:5434/notification_platform`
 - Database username: `postgres`
 - Database password: `postgres`
 - JWT secret env override: `JWT_SECRET`
 - JWT expiration env override: `JWT_EXPIRATION`
+- Docker Compose PostgreSQL port mapping: `5434:5432`
 
 Start locally:
 
 ```bash
+docker compose up -d
 mvn spring-boot:run
 ```
 
@@ -68,7 +84,3 @@ Compile check:
 ```bash
 mvn -q -DskipTests compile
 ```
-
-Note:
-
-- The repository includes `compose.yaml`, but its PostgreSQL password is currently `secret` while the application config expects `postgres`. Make those values consistent before running with Docker Compose.
