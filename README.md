@@ -1,5 +1,11 @@
 # Notification Delivery Platform • API
 
+[![CI](https://github.com/yusufjon-akhmedov/notification-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/yusufjon-akhmedov/notification-platform/actions/workflows/ci.yml)
+
+[![Docker](https://github.com/yusufjon-akhmedov/notification-platform/actions/workflows/docker.yml/badge.svg)](https://github.com/yusufjon-akhmedov/notification-platform/actions/workflows/docker.yml)
+
+[![Qodana](https://github.com/yusufjon-akhmedov/notification-platform/actions/workflows/qodana_code_quality.yml/badge.svg?branch=main)](https://github.com/yusufjon-akhmedov/notification-platform/actions/workflows/qodana_code_quality.yml)
+
 > JWT authentication, RBAC, template management, notification lifecycle, mock dispatch, delivery attempt tracking
 
 **Notification Delivery Platform API** is a monolithic REST backend for creating and managing notification
