@@ -3,7 +3,7 @@ spring:
     name: notification-platform
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/notification_platform
+    url: jdbc:postgresql://localhost:5434/notification_platform
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -32,3 +32,7 @@ management:
   endpoint:
     health:
       show-details: always
+
+jwt:
+  secret: ${JWT_SECRET:notification-platform-local-secret-key-2026}
+  expiration: ${JWT_EXPIRATION:86400000}

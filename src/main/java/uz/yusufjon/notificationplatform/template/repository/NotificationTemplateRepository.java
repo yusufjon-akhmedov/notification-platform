@@ -7,4 +7,8 @@ import java.util.Optional;
 
 public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, Long> {
     Optional<NotificationTemplate> findByName(String name);
+
+    boolean existsByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Long id);
 }

@@ -5,9 +5,9 @@ services:
     environment:
       POSTGRES_DB: notification_platform
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - notification_platform_pgdata:/var/lib/postgresql/data
     healthcheck:

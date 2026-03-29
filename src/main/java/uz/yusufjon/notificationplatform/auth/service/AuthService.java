@@ -1,11 +1,19 @@
 package uz.yusufjon.notificationplatform.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.yusufjon.notificationplatform.auth.dto.AuthResponse;
 import uz.yusufjon.notificationplatform.auth.dto.LoginRequest;
 import uz.yusufjon.notificationplatform.auth.dto.RegisterRequest;
+import uz.yusufjon.notificationplatform.auth.security.JwtService;
 import uz.yusufjon.notificationplatform.common.enums.RoleName;
 import uz.yusufjon.notificationplatform.exception.BadRequestException;
 import uz.yusufjon.notificationplatform.exception.ResourceNotFoundException;
@@ -21,7 +29,10 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new BadRequestException("Email already exists");
@@ -39,23 +50,39 @@ public class AuthService {
 
         userRepository.save(user);
 
-        return new AuthResponse("User registered successfully");
+        return new AuthResponse(
+                "User registered successfully",
+                null,
+                null,
+                user.getEmail(),
+                user.getRole().getName().name()
+        );
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BadRequestException("Invalid email or password"));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
 
-        boolean matches = passwordEncoder.matches(request.password(), user.getPassword());
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userRepository.findByEmail(request.email())
+                    .orElseThrow(() -> new BadRequestException("Invalid email or password"));
 
-        if (!matches) {
+            String accessToken = jwtService.generateToken(userDetails);
+
+            return new AuthResponse(
+                    "Login successful",
+                    accessToken,
+                    "Bearer",
+                    user.getEmail(),
+                    user.getRole().getName().name()
+            );
+        } catch (BadCredentialsException ex) {
             throw new BadRequestException("Invalid email or password");
-        }
-
-        if (!user.isEnabled()) {
+        } catch (DisabledException ex) {
             throw new BadRequestException("User is disabled");
         }
-
-        return new AuthResponse("Login successful");
     }
 }
