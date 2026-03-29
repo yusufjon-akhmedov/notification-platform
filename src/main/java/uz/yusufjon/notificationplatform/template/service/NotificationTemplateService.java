@@ -1,9 +1,13 @@
 package uz.yusufjon.notificationplatform.template.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import uz.yusufjon.notificationplatform.common.dto.PageResponse;
+import uz.yusufjon.notificationplatform.common.enums.NotificationChannel;
 import uz.yusufjon.notificationplatform.exception.BadRequestException;
 import uz.yusufjon.notificationplatform.exception.ResourceNotFoundException;
 import uz.yusufjon.notificationplatform.notification.repository.NotificationRepository;
@@ -13,11 +17,14 @@ import uz.yusufjon.notificationplatform.template.dto.NotificationTemplateUpdateR
 import uz.yusufjon.notificationplatform.template.entity.NotificationTemplate;
 import uz.yusufjon.notificationplatform.template.repository.NotificationTemplateRepository;
 
-import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationTemplateService {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS =
+            Set.of("id", "name", "channel", "active", "createdAt", "updatedAt");
 
     private final NotificationTemplateRepository notificationTemplateRepository;
     private final NotificationRepository notificationRepository;
@@ -37,11 +44,23 @@ public class NotificationTemplateService {
     }
 
     @Transactional(readOnly = true)
-    public List<NotificationTemplateResponse> getAll() {
-        return notificationTemplateRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public PageResponse<NotificationTemplateResponse> getAll(
+            NotificationChannel channel,
+            Boolean active,
+            String name,
+            Pageable pageable
+    ) {
+        validateSort(pageable);
+
+        Page<NotificationTemplateResponse> page = notificationTemplateRepository.findAllByFilters(
+                        channel,
+                        active,
+                        normalizeKeyword(name),
+                        pageable
+                )
+                .map(this::toResponse);
+
+        return PageResponse.from(page);
     }
 
     @Transactional(readOnly = true)
@@ -90,6 +109,18 @@ public class NotificationTemplateService {
         if (exists) {
             throw new BadRequestException("Template name already exists");
         }
+    }
+
+    private void validateSort(Pageable pageable) {
+        pageable.getSort().forEach(order -> {
+            if (!ALLOWED_SORT_FIELDS.contains(order.getProperty())) {
+                throw new BadRequestException("Unsupported sort field for templates: " + order.getProperty());
+            }
+        });
+    }
+
+    private String normalizeKeyword(String value) {
+        return StringUtils.hasText(value) ? value.trim() : null;
     }
 
     private NotificationTemplateResponse toResponse(NotificationTemplate template) {

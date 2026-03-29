@@ -2,9 +2,14 @@ package uz.yusufjon.notificationplatform.template.controller;
 
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,13 +20,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uz.yusufjon.notificationplatform.common.dto.PageResponse;
+import uz.yusufjon.notificationplatform.common.enums.NotificationChannel;
 import uz.yusufjon.notificationplatform.template.dto.NotificationTemplateCreateRequest;
 import uz.yusufjon.notificationplatform.template.dto.NotificationTemplateResponse;
 import uz.yusufjon.notificationplatform.template.dto.NotificationTemplateUpdateRequest;
 import uz.yusufjon.notificationplatform.template.service.NotificationTemplateService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/templates")
@@ -43,9 +49,19 @@ public class NotificationTemplateController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'OPERATOR')")
-    @Operation(summary = "List notification templates")
-    public ResponseEntity<List<NotificationTemplateResponse>> getAll() {
-        return ResponseEntity.ok(notificationTemplateService.getAll());
+    @Operation(summary = "List notification templates with pagination, sorting, and optional filters")
+    public ResponseEntity<PageResponse<NotificationTemplateResponse>> getAll(
+            @Parameter(description = "Filter by notification channel")
+            @RequestParam(required = false) NotificationChannel channel,
+            @Parameter(description = "Filter by active status")
+            @RequestParam(required = false) Boolean active,
+            @Parameter(description = "Filter by template name keyword")
+            @RequestParam(required = false) String name,
+            @ParameterObject
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(notificationTemplateService.getAll(channel, active, name, pageable));
     }
 
     @GetMapping("/{id}")
